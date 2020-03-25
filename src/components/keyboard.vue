@@ -9,7 +9,6 @@
       <li>{{numArr[3]}}</li>
       <li>{{numArr[4]}}</li>
       <li>{{numArr[5]}}</li>
-      <li>{{numArr[6]}}</li>
     </div>
     <!-- 选择车牌号 首个汉字键盘 弹出层 -->
     <div class="plate_number">
@@ -189,9 +188,16 @@ export default {
       } else {
         // 把选中的值 push 到 numArr 内
         this.numArr.push(this.English_Number[index].name)
+        // 如果 numArr 中的值== 7 个（车牌号的最大位数），传入父组件
+        if (this.numArr.length == 6) {
+          var data = [this.first, ...this.numArr]
+          this.getboard(data)
+        }
         // 如果 numArr 中的值超过 7 个（车牌号的最大位数），删除最后一个
-        if (this.numArr.length > 7) {
+        if (this.numArr.length > 6) {
           this.numArr.pop()
+          var data = [this.first, ...this.numArr]
+          this.getboard(data)
         }
       }
     },

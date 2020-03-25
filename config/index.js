@@ -10,7 +10,22 @@ module.exports = {
     // Paths
     assetsSubDirectory: 'static',
     assetsPublicPath: '/',
-    proxyTable: {},
+    proxyTable: {
+      '/menu': {
+        target: 'http://101.200.46.29:20001',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/menu': '/menu',
+        }
+      },
+      '/about': {
+        target: 'http://101.200.46.29:20001',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/about': '/about',
+        }
+      },
+    },
 
     // Various Dev Server settings
     host: '192.168.1.43', // can be overwritten by process.env.HOST
@@ -49,7 +64,7 @@ module.exports = {
 
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
-    assetsSubDirectory: 'static',
+    assetsSubDirectory: 'dist/static',
     assetsPublicPath: '/',
 
     /**

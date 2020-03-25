@@ -62,7 +62,8 @@ export default {
       // 异步更新数据
       this.loading = false;
       this.finished = true;
-    }
+    },
+
   },
 }
 </script>

@@ -43,7 +43,7 @@
           <van-field readonly
                      clickable
                      name="calendar"
-                     :value="boradform.timesvalue"
+                     :value="boradform.appointmentTime"
                      label="预约时间："
                      placeholder="点击选择日期"
                      @click="timesshowCalendar = true" />
@@ -55,14 +55,14 @@
         <van-field readonly
                    clickable
                    name="picker"
-                   :value="boradform.maintenancecolumns"
+                   :value="boradform.project"
                    label="维修项目"
                    placeholder="选择维修项目"
                    @click="maintenanceshowCalendar = true" />
         <van-popup v-model="maintenanceshowCalendar"
                    position="bottom">
           <van-picker show-toolbar
-                      :columns="maintenancecolumns"
+                      :columns="project"
                       @confirm="maintenanceonConfirm"
                       @cancel="maintenanceshowCalendar = false" />
         </van-popup>
@@ -80,13 +80,14 @@
 </template>
 <script>
 import keyboard from "../components/keyboard";
+import { Toast } from 'vant';
 export default {
   components: {
     keyboard
   },
   data () {
     return {
-      maintenancecolumns: ['轮胎维修', '发动机维修'],
+      project: ['轮胎维修', '发动机维修'],
       boardselectshow: false,
       boradArr: [],
       actions: [
@@ -98,19 +99,61 @@ export default {
       maintenanceshowCalendar: false,
       boradform: {
         timesvalue: "",
-        maintenancecolumns: ""
+        project: "",
+        plateNumber: ""
+      },
+      boradparams: {
+        timesvalue: "",
+        project: "",
+        plateNumber: ""
       },
       uploader: [{ url: 'https://img.yzcdn.cn/vant/leaf.jpg' }],
     }
   },
+  mounted () {
+    this.getwarranty_pro()
+  },
   methods: {
 
     maintenanceonConfirm (value) {
-      this.boradform.maintenancecolumns = value;
+      this.boradform.project = value;
+      this.boradparams.project = value;
       this.maintenanceshowCalendar = false;
     },
     onSubmit (values) {
+      console.log(this.boradparams)
+      this.axios.post('about/maintenance_add', this.boradparams)
+        .then(res => {
+          if (res.data.code !== 10000) {
+            Toast.fail(res.data.msg + "请重新填写错误信息");
+          } else {
+            Toast.fail(res.data.msg);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+        })
       console.log('submit', values);
+    },
+    // 保修项目
+    getwarranty_pro () {
+      this.project = []
+      this.axios.post('/menu/warranty_pro')
+        .then(res => {
+          if (res.data.code !== 10000) {
+            Toast.fail(res.data.msg);
+            return false;
+          }
+          console.log(res)
+          var data = res.data.data;
+          data.forEach(element => {
+            var data = { "keyId": element.value, "text": element.key };
+            this.project.push(data)
+          });
+        })
+        .catch(err => {
+          console.error(err);
+        })
     },
     onSelect (item) {
       // 默认情况下点击选项时不会自动收起
@@ -118,12 +161,14 @@ export default {
       this.boardselectshow = false;
       Toast(item.name);
     },
-
     getboard (borad) {
       console.log(borad)
+      this.boradform.plateNumber = borad;
+      this.boradparams.plateNumber = borad.join("");
     },
-    timesonConfirm (date) {
-      var date = date;
+    timesonConfirm (times) {
+      var date = times;
+      var timestamp = parseInt(new Date(times).getTime() / 1000);
       var m = date.getMonth() + 1;
       var d = date.getDate();
       if (m >= 1 && m <= 9) {
@@ -133,7 +178,8 @@ export default {
         d = "0" + d;
       }
       var timer = date.getFullYear() + "-" + m + "-" + d;
-      this.boradform.timesvalue = timer;
+      this.boradform.appointmentTime = timer;
+      this.boradparams.appointmentTime = timestamp;
       this.timesshowCalendar = false;
     },
   },

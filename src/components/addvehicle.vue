@@ -56,7 +56,7 @@
               <div class="infotxt">
                 <van-row type="flex"
                          justify="space-between">
-                  <van-col span="16">车辆信息：</van-col>
+                  <van-col span="16">车牌号：</van-col>
 
                 </van-row>
               </div>
@@ -70,7 +70,7 @@
             <van-field readonly
                        clickable
                        name="picker"
-                       :value="boradform.maintenancecolumns"
+                       :value="boradform.registTime"
                        label="车辆品牌"
                        placeholder="选择车辆品牌"
                        @click="maintenanceshowCalendar = true" />
@@ -83,7 +83,7 @@
             </van-popup>
           </div>
           <div>
-            <van-field v-model="username"
+            <van-field v-model="boradform.frameNumber"
                        name="车架号"
                        label="车架号"
                        placeholder="车架号"
@@ -94,7 +94,7 @@
               <van-field readonly
                          clickable
                          name="calendar"
-                         :value="boradform.timesvalue"
+                         :value="boradform.registTime"
                          label="注册时间"
                          placeholder="点击选择日期"
                          @click="timesshowCalendar = true" />
@@ -126,7 +126,7 @@ export default {
   data () {
     return {
       username: '',
-      maintenancecolumns: ['轮胎维修', '发动机维修'],
+      maintenancecolumns: ['奥迪Q7', '宝马X3', '宝骏530'],
       boardselectshow: false,
       boradArr: [],
       actions: [
@@ -137,8 +137,16 @@ export default {
       timesshowCalendar: false,
       maintenanceshowCalendar: false,
       boradform: {
-        timesvalue: "",
-        maintenancecolumns: ""
+        frameNumber: "",
+        models: "",
+        plateNumber: "",
+        registTime: ""
+      },
+      boradparams: {
+        frameNumber: "",
+        models: "",
+        plateNumber: "",
+        registTime: ""
       },
       activeName: 'a',
       uploader: [{ url: 'https://img.yzcdn.cn/vant/leaf.jpg' }],
@@ -147,7 +155,8 @@ export default {
   methods: {
 
     maintenanceonConfirm (value) {
-      this.boradform.maintenancecolumns = value;
+      this.boradform.frameNumber = value;
+      this.boradparams.frameNumber = value;
       this.maintenanceshowCalendar = false;
     },
     onSubmit (values) {
@@ -161,9 +170,12 @@ export default {
 
     getboard (borad) {
       console.log(borad)
+      this.boradform.plateNumber = borad;
+      this.boradparams.plateNumber = borad.join("");
     },
     timesonConfirm (date) {
-      var date = date;
+      var date = times;
+      var timestamp = parseInt(new Date(times).getTime() / 1000);
       var m = date.getMonth() + 1;
       var d = date.getDate();
       if (m >= 1 && m <= 9) {
@@ -173,7 +185,8 @@ export default {
         d = "0" + d;
       }
       var timer = date.getFullYear() + "-" + m + "-" + d;
-      this.boradform.timesvalue = timer;
+      this.boradform.registTime = timer;
+      this.boradparams.registTime = timestamp;
       this.timesshowCalendar = false;
     },
   }
