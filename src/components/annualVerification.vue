@@ -91,16 +91,26 @@
           </van-popup>
         </div>
         <div>
-          <van-field clickable
+          <!-- <van-field clickable
                      name="calendar"
                      :value="boradform.appointmentTime"
                      label="时间："
                      readonly="readonly"
                      placeholder="点击选择日期"
-                     @click="timesshowCalendar = true" />
-          <van-calendar v-model="timesshowCalendar"
+                     @click="timesshowCalendar = true" /> -->
+          <!-- <van-calendar v-model="timesshowCalendar"
                         type="datetime"
-                        @confirm="timesonConfirm" />
+                        color="#07c160"
+                        @confirm="timesonConfirm" /> -->
+          <van-field readonly
+                     clickable
+                     name="calendar"
+                     :value="value"
+                     label="时间"
+                     placeholder="点击选择日期"
+                     @click="showCalendar = true" />
+          <van-calendar v-model="showCalendar"
+                        @confirm="onConfirm" />
         </div>
       </div>
       <div style="margin: 16px;">
@@ -125,6 +135,8 @@ export default {
   },
   data () {
     return {
+      value: '',
+      showCalendar: false,
       username: '',
       password: '',
       boradArr: [],
@@ -170,19 +182,42 @@ export default {
     }
   },
   mounted () {
+    console.log(this.oepnID)
     this.getseatcolumns()
-    this.getoperation()
-    this.getseat_spec()
+    this.getoperation();
+    this.getseat_spec();
+    this.getcarlist()
+
   },
   methods: {
+    getcarlist () {
+      this.actions = []
+      var openId = "null"
+      var params = {
+        openId: openId
+      }
+      this.axios.post("/careful/car_list", params)
+        .then(res => {
+          console.log(res);
+          var list = res.data.data.list;
+          list.forEach((i, k) => {
+            this.actions.push(
+              { name: i.models, subname: '车牌号：' + i.plateNumber, value: i.plateNumber },
+            )
+          })
+        })
+        .catch(err => {
+          console.error(err);
+        })
+    },
     onSubmit (values) {
       this.axios.post('/about/careful_add', this.boradparams)
         .then(res => {
           console.log(res)
-          if (res.data.code !== 0) {
+          if (res.data.code !== 10000) {
             Toast.fail(res.data.msg + "请重新填写错误信息");
           } else {
-            Toast.fail(res.data.msg);
+            Toast.success(res.data.msg);
           }
         })
         .catch(err => {
@@ -294,32 +329,11 @@ export default {
       this.boradparams.scale = value.keyId;
       this.operationcshowPicker = false;
     },
-    formatSeconds (value) {
-      var reg = /^(-|\+)?\d+$/;
-      if (reg.test(value)) {
-        var hour = Math.floor(value / 3600);
-        var minute = Math.floor((value % 3600) / 60);
-        var second = value % 60;
-        var posstr = "";
-        if (hour) {
-          if (hour < 10)
-            posstr += "0";
-          posstr += hour;
-          posstr += ":";
-        } else {
-          posstr += "00:";
-        }
-        if (minute < 10)
-          posstr += "0";
-        posstr += minute;
-        posstr += ":";
-        if (second < 10)
-          posstr += "0";
-        posstr += second;
-        return posstr;
-      } else {
-        return "";
-      }
+    onConfirm (date) {
+      this.value = `${date.getMonth() + 1}/${date.getDate()}`;
+      var timestamp = parseInt(new Date(date).getTime() / 1000);
+      this.boradparams.appointmentTime = timestamp;
+      this.showCalendar = false;
     },
     timesonConfirm (times) {
       var date = times;
@@ -341,7 +355,8 @@ export default {
       // 默认情况下点击选项时不会自动收起
       // 可以通过 close-on-click-action 属性开启自动收起
       this.boardselectshow = false;
-      Toast(item.name);
+      this.boradparams.plateNumber = item.value;
+      this.boradArr = item.value.split('');
     },
 
   },

@@ -8,49 +8,25 @@
     <div class="listCont">
       <van-list v-model="loading"
                 :finished="finished"
+                finished-text="没有更多数据，快去添加"
                 @load="onLoad">
-        <van-card title="川A-123456"
-                  thumb="http://img1.imgtn.bdimg.com/it/u=2085257975,2837583384&fm=26&gp=0.jpg">
-          <template #tags>
-            <van-tag plain
-                     type="danger">奥迪A6</van-tag>
-          </template>
-          <template #desc>
-            <div>
-              <p class="cardDesc">
-                注册日期：2020年01月01日
-              </p>
-            </div>
-          </template>
-        </van-card>
-        <van-card title="川A-888888"
-                  thumb="http://img.mp.itc.cn/upload/20160508/e1523a4ef01b48ee858ff096d72d8e37_th.jpg">
-          <template #tags>
-            <van-tag plain
-                     type="danger">VISION NEXT 100</van-tag>
-          </template>
-          <template #desc>
-            <div>
-              <p class="cardDesc">
-                注册日期：2020年02月01日
-              </p>
-            </div>
-          </template>
-        </van-card>
-        <van-card title="川A-666666"
-                  thumb="http://dealer.qc188.com/dealer/uploadfile/2017/11/11/20171111153358706.jpg">
-          <template #tags>
-            <van-tag plain
-                     type="danger">奔弛G500</van-tag>
-          </template>
-          <template #desc>
-            <div>
-              <p class="cardDesc">
-                注册日期：2020年01月01日
-              </p>
-            </div>
-          </template>
-        </van-card>
+        <div v-for="(item, index) in list"
+             :key="index">
+          <van-card :title="item.plateNumber"
+                    :thumb="item.image">
+            <template #tags>
+              <van-tag plain
+                       type="danger">{{item.models}}</van-tag>
+            </template>
+            <template #desc>
+              <div>
+                <p class="cardDesc">
+                  注册日期：{{item.registTime}}
+                </p>
+              </div>
+            </template>
+          </van-card>
+        </div>
 
       </van-list>
     </div>
@@ -61,11 +37,28 @@ export default {
   data () {
     return {
       loading: false,
-      finished: false
+      finished: false,
+      list: []
     }
   },
+  mounted () {
+    this.getcarlist()
+  },
   methods: {
-
+    getcarlist () {
+      var openId = "null"
+      var params = {
+        openId: openId
+      }
+      this.axios.post("/careful/car_list", params)
+        .then(res => {
+          console.log(res);
+          this.list = res.data.data.list
+        })
+        .catch(err => {
+          console.error(err);
+        })
+    },
     onLoad () {
       // 异步更新数据
       this.loading = false;

@@ -91,9 +91,7 @@ export default {
       boardselectshow: false,
       boradArr: [],
       actions: [
-        { name: '奥迪Q7', subname: '车牌号：川A497979' },
-        { name: '宝马X3', subname: '车牌号：川A497979' },
-        { name: '宝骏530', subname: '车牌号：川A497979' }
+
       ],
       timesshowCalendar: false,
       maintenanceshowCalendar: false,
@@ -116,8 +114,8 @@ export default {
   methods: {
 
     maintenanceonConfirm (value) {
-      this.boradform.project = value;
-      this.boradparams.project = value;
+      this.boradform.project = value.text;
+      this.boradparams.project = value.keyId;
       this.maintenanceshowCalendar = false;
     },
     onSubmit (values) {
@@ -127,7 +125,7 @@ export default {
           if (res.data.code !== 10000) {
             Toast.fail(res.data.msg + "请重新填写错误信息");
           } else {
-            Toast.fail(res.data.msg);
+            Toast.success(res.data.msg);
           }
         })
         .catch(err => {

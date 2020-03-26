@@ -1,4 +1,6 @@
-'use strict'
+
 module.exports = {
-  NODE_ENV: '"production"'
-}
+
+  //添加
+  API_ROOT: '"http://101.200.46.29:20001"'
+};

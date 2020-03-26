@@ -25,6 +25,20 @@ module.exports = {
           '^/about': '/about',
         }
       },
+      '/careful': {
+        target: 'http://101.200.46.29:20001',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/careful': '/careful',
+        }
+      },
+      '/personal': {
+        target: 'http://101.200.46.29:20001',
+        changeOrigin: true,
+        pathRewrite: {
+          '^/personal': '/personal',
+        }
+      },
     },
 
     // Various Dev Server settings
@@ -64,8 +78,8 @@ module.exports = {
 
     // Paths
     assetsRoot: path.resolve(__dirname, '../dist'),
-    assetsSubDirectory: 'dist/static',
-    assetsPublicPath: '/',
+    assetsSubDirectory: 'static',
+    assetsPublicPath: '',
 
     /**
      * Source Maps

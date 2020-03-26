@@ -19,18 +19,11 @@
                          label-width="100%"
                          label="请上传需要驾驶证图片：">
                 <template #input>
-                  <van-uploader :max-count="6"
+                  <van-uploader :max-count="1"
+                                :after-read="upafter"
                                 v-model="uploader" />
                 </template>
               </van-field>
-            </div>
-            <div style="margin: 16px;">
-              <van-button round
-                          block
-                          type="info"
-                          native-type="submit">
-                提交
-              </van-button>
             </div>
           </van-form>
         </div>
@@ -66,7 +59,7 @@
 
         <van-form @submit="onsetSubmit"
                   label-align='left'>
-          <div>
+          <!-- <div>
             <van-field readonly
                        clickable
                        name="picker"
@@ -81,6 +74,13 @@
                           @confirm="maintenanceonConfirm"
                           @cancel="maintenanceshowCalendar = false" />
             </van-popup>
+          </div> -->
+          <div>
+            <van-field v-model="boradform.models"
+                       name="品牌名称"
+                       label="品牌名称"
+                       placeholder="品牌名称"
+                       :rules="[{ required: true, message: '请填写品牌名称' }]" />
           </div>
           <div>
             <van-field v-model="boradform.frameNumber"
@@ -98,8 +98,18 @@
                          label="注册时间"
                          placeholder="点击选择日期"
                          @click="timesshowCalendar = true" />
-              <van-calendar v-model="timesshowCalendar"
-                            @confirm="timesonConfirm" />
+              <!-- <van-datetime-picker v-model="currentDate"
+                                  
+                                   type="date" /> -->
+              <van-popup v-model="timesshowCalendar"
+                         position="bottom">
+                <!-- 开始时间 -->
+                <van-datetime-picker @confirm="timesonConfirm"
+                                     :min-date="minDate"
+                                     :max-date="maxDate"
+                                     v-model="boradparams.registTime"
+                                     type="date" />
+              </van-popup>
             </div>
           </div>
           <div style="margin: 16px;">
@@ -118,6 +128,7 @@
 <script>
 
 import keyboard from "../components/keyboard";
+import { Toast } from 'vant';
 export default {
 
   components: {
@@ -137,23 +148,48 @@ export default {
       timesshowCalendar: false,
       maintenanceshowCalendar: false,
       boradform: {
-        frameNumber: "",
-        models: "",
-        plateNumber: "",
+        frameNumber: "LS5W3ABE39B059025",
+        models: "长安",
+        plateNumber: "川A78YY4",
         registTime: ""
       },
       boradparams: {
-        frameNumber: "",
-        models: "",
-        plateNumber: "",
+        frameNumber: "LS5W3ABE39B059025",
+        models: "长安",
+        plateNumber: "川A78YY4",
         registTime: ""
       },
       activeName: 'a',
-      uploader: [{ url: 'https://img.yzcdn.cn/vant/leaf.jpg' }],
+      uploader: [],
+      file: "",
+      minDate: new Date(1996, 0, 1),
+      maxDate: new Date(2025, 10, 1),
+      currentDate: new Date(),
+      imgfile: ""
     };
   },
   methods: {
+    upafter (file) {
+      file.message = '上传中...';
+      file.status = 'uploading';
+      var params = new FormData();
+      params.append("file", file.file)
+      this.file = file.file
+      this.axios.post('/personal/car_add_one', params)
+        .then(res => {
+          if (res.data.code !== 10000) {
+            Toast.fail(res.data.msg + "请重新上传");
 
+            file.status = 'failed';
+            file.message = '上传失败'
+          } else {
+            Toast.success(res.data.msg);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+        })
+    },
     maintenanceonConfirm (value) {
       this.boradform.frameNumber = value;
       this.boradparams.frameNumber = value;
@@ -161,19 +197,28 @@ export default {
     },
     onSubmit (values) {
       console.log('submit', values);
+      console.log(this.boradparams)
     },
     onsetSubmit (values) {
-      console.log('submit', values);
+      this.axios.post('/personal/car_add_two', this.boradparams)
+        .then(res => {
+          if (res.data.code !== 10000) {
+            Toast.fail(res.data.msg + "请重新填写错误信息");
+          } else {
+            Toast.fail(res.data.msg);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+        })
     },
     onClickLeft () {
     },
-
     getboard (borad) {
-      console.log(borad)
       this.boradform.plateNumber = borad;
       this.boradparams.plateNumber = borad.join("");
     },
-    timesonConfirm (date) {
+    timesonConfirm (times) {
       var date = times;
       var timestamp = parseInt(new Date(times).getTime() / 1000);
       var m = date.getMonth() + 1;

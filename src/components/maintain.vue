@@ -107,7 +107,7 @@ export default {
         project: "",
         plateNumber: ""
       },
-      uploader: [{ url: 'https://img.yzcdn.cn/vant/leaf.jpg' }],
+      uploader: [],
     }
   },
   mounted () {
@@ -135,18 +135,18 @@ export default {
         })
     },
     maintenanceonConfirm (value) {
-      this.boradform.project = value;
-      this.boradparams.project = value;
+      this.boradform.project = value.text;
+      this.boradparams.project = value.keyId;
       this.maintenanceshowCalendar = false;
     },
     onSubmit (values) {
       console.log(this.boradparams)
       this.axios.post('about/preserve_add', this.boradparams)
         .then(res => {
-          if (res.data.code !== 0) {
+          if (res.data.code !== 10000) {
             Toast.fail(res.data.msg + "请重新填写错误信息");
           } else {
-            Toast.fail(res.data.msg);
+            Toast.success(res.data.msg);
           }
         })
         .catch(err => {

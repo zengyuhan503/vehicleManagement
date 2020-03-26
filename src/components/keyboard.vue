@@ -68,6 +68,8 @@ export default {
   watch: {
     boradArr (newval, lodval) {
       console.log(newval, lodval)
+      this.first = newval[0];
+      this.numArr = newval.slice(1);
     }
   },
   data () {

@@ -50,6 +50,12 @@ export default {
       }
     }
   },
+  methods: {
+
+  },
+  mounted () {
+    this.$oepnID = "1"
+  },
 }
 </script>
 

@@ -24,7 +24,7 @@
                          height="3rem"
                          :src="gridImg.icon3" />
             </div>
-            <p> 预约钣喷：10</p>
+            <p> 预约钣喷:{{car_num.lacqueredNum}}</p>
           </div>
         </van-grid-item>
         <van-grid-item to="/maintenancelist">
@@ -34,7 +34,7 @@
                          height="3rem"
                          :src="gridImg.icon1" />
             </div>
-            <p> 预约维修：10</p>
+            <p> 预约维修:{{car_num.maintenanceNum}}</p>
           </div>
         </van-grid-item>
         <van-grid-item to="/maintainlist">
@@ -44,7 +44,7 @@
                          height="3rem"
                          :src="gridImg.icon2" />
             </div>
-            <p> 预约养护：10</p>
+            <p> 预约养护:{{car_num.preserveNum}}</p>
           </div>
         </van-grid-item>
       </van-grid>
@@ -64,8 +64,33 @@ export default {
         icon1: require("../assets/img/icon (1).png"),
         icon2: require("../assets/img/icon (2).png"),
         icon3: require("../assets/img/icon (3).png"),
+      },
+      car_num: {
+        lacqueredNum: "0",
+        maintenanceNum: "0",
+        preserveNum: "0",
       }
     }
+  },
+  methods: {
+    getcarmenu () {
+      var openId = "null"
+      var params = {
+        openId: openId
+      }
+      this.axios.post("/personal/car_num")
+        .then(res => {
+          console.log(res);
+          this.car_num = res.data.data.list[0];
+          console.log(this.car_num)
+        })
+        .catch(err => {
+          console.error(err);
+        })
+    }
+  },
+  mounted () {
+    this.getcarmenu()
   },
 }
 </script>

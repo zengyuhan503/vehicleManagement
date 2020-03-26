@@ -43,7 +43,7 @@
           <van-field readonly
                      clickable
                      name="calendar"
-                     :value="boradform.timesvalue"
+                     :value="boradform.appointmentTime"
                      label="时间："
                      placeholder="点击选择日期"
                      @click="timesshowCalendar = true" />
@@ -54,9 +54,10 @@
       <div class="upimg">
         <van-field name="uploader"
                    label-width="100%"
-                   label="请上传需要钣喷的部位：（最多可以拍摄六张）">
+                   label="请上传需要钣喷的部位：">
           <template #input>
             <van-uploader :max-count="6"
+                          :after-read="upafter"
                           v-model="uploader" />
           </template>
         </van-field>
@@ -74,6 +75,7 @@
 </template>
 <script>
 import keyboard from "../components/keyboard";
+import { Toast } from 'vant';
 export default {
   components: {
     keyboard
@@ -89,14 +91,32 @@ export default {
       ],
       timesshowCalendar: false,
       boradform: {
-        timesvalue: "",
+        appointmentTime: "",
       },
-      uploader: [{ url: 'https://img.yzcdn.cn/vant/leaf.jpg' }],
+      uploader: [],
     }
   },
   methods: {
+    upafter (file) {
+
+      this.imgfile = file.file
+    },
     onSubmit (values) {
-      console.log('submit', values);
+      var params = new FormData();
+      params.append("appointmentTime", this.boradform.appointmentTime);
+      params.append("file", this.imgfile);
+      params.append("plateNumber", this.boradform.plateNumber);
+      this.axios.post("/about/lacquered_add", params)
+        .then(res => {
+          if (res.data.code !== 10000) {
+            Toast.fail(res.data.msg + "请重新填写错误信息");
+          } else {
+            Toast.success(res.data.msg);
+          }
+        })
+        .catch(err => {
+          console.error(err);
+        })
     },
     onSelect (item) {
       // 默认情况下点击选项时不会自动收起
@@ -107,6 +127,7 @@ export default {
 
     getboard (borad) {
       console.log(borad)
+      this.boradform.plateNumber = borad.join("");
     },
     timesonConfirm (date) {
       var date = date;
@@ -119,7 +140,7 @@ export default {
         d = "0" + d;
       }
       var timer = date.getFullYear() + "-" + m + "-" + d;
-      this.boradform.timesvalue = timer;
+      this.boradform.appointmentTime = timer;
       this.timesshowCalendar = false;
     },
   },
